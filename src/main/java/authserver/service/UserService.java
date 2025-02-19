@@ -1,12 +1,14 @@
 package authserver.service;
 
 import authserver.dto.User;
+import authserver.exception.ResourceNotFoundException;
 import authserver.mapper.interfaces.UserMapper;
 import authserver.model.UserEntity;
 import authserver.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -28,5 +30,36 @@ public class UserService {
 
     public User createUser(User user) {
         return userMapper.BtoA(userRepository.save(userMapper.AtoB(user)));
+    }
+
+    public User updateUser(Long id, User user) {
+        Optional<UserEntity> existingUserDetails = userRepository.findById(id);
+        if(existingUserDetails.isEmpty()){
+            throw new ResourceNotFoundException("USER_NOT_FOUND","User with provided id is not found.");
+        }
+
+        if(!existingUserDetails.get().getUsername().equalsIgnoreCase(user.getUsername())){
+            throw new ResourceNotFoundException("USER_NOT_MODIFIED", "Username cannot be modified.");
+        }else {
+            return userMapper.BtoA(userRepository.save(userMapper.AtoB(user)));
+        }
+
+    }
+
+    public void deleteUser(Long id) {
+
+        Optional<UserEntity> existingUserDetails = userRepository.findById(id);
+        if(existingUserDetails.isEmpty()){
+            throw new ResourceNotFoundException("USER_NOT_FOUND","User with provided id is not found.");
+        }
+        userRepository.deleteById(id);
+    }
+
+    public User getByUserId(Long id) {
+        Optional<UserEntity> existingUserDetails = userRepository.findById(id);
+        if(existingUserDetails.isEmpty()){
+            throw new ResourceNotFoundException("USER_NOT_FOUND","User with provided id is not found.");
+        }
+        return userMapper.BtoA(existingUserDetails.get());
     }
 }
