@@ -10,6 +10,7 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
+@DecoratedWith(UserDecorator.class)
 public interface UserMapper {
 
     UserEntity AtoB(User user);

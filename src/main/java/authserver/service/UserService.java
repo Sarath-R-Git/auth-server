@@ -29,7 +29,11 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        return userMapper.BtoA(userRepository.save(userMapper.AtoB(user)));
+      try {
+            return userMapper.BtoA(userRepository.save(userMapper.AtoB(user)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public User updateUser(Long id, User user) {
@@ -41,6 +45,7 @@ public class UserService {
         if(!existingUserDetails.get().getUsername().equalsIgnoreCase(user.getUsername())){
             throw new ResourceNotFoundException("USER_NOT_MODIFIED", "Username cannot be modified.");
         }else {
+            user.setId(existingUserDetails.get().getId());
             return userMapper.BtoA(userRepository.save(userMapper.AtoB(user)));
         }
 
