@@ -5,6 +5,8 @@ import authserver.exception.ResourceNotFoundException;
 import authserver.mapper.interfaces.UserMapper;
 import authserver.model.UserEntity;
 import authserver.repository.UserRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,10 +19,13 @@ public class UserService {
 
     private final UserMapper userMapper;
 
+    private final PasswordEncoder passwordEncoder;
+
 
     public UserService(UserRepository userRepository, UserMapper userMapper){
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = new BCryptPasswordEncoder();;
     }
 
     public List<User> getAllUsers() {
@@ -30,6 +35,7 @@ public class UserService {
 
     public User createUser(User user) {
       try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             return userMapper.BtoA(userRepository.save(userMapper.AtoB(user)));
         } catch (Exception e) {
             throw new RuntimeException(e);
